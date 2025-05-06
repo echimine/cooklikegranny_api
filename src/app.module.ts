@@ -6,6 +6,8 @@ import { RecipesModule } from './recipes/recipes.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Recipes } from './recipes/recipe.entity';
+import { InstructionsModule } from './instructions/instructions.module';
+import { Instructions } from './instructions/entities/instruction.entity';
 
 @Module({
   imports: [
@@ -20,11 +22,12 @@ import { Recipes } from './recipes/recipe.entity';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [Recipes],
+        entities: [Recipes, Instructions],
         synchronize: true,
       }),
     }),
     RecipesModule,
+    InstructionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

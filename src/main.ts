@@ -10,6 +10,7 @@ async function bootstrap() {
 
   // Validation automatique
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  // , forbidNonWhitelisted: true
 
   // Serve les images depuis /public/uploads
   app.use(

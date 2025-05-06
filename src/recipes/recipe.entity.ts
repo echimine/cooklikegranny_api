@@ -1,5 +1,5 @@
-// src/recipes/recipe.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Instructions } from '../instructions/entities/instruction.entity';
 
 @Entity()
 export class Recipes {
@@ -12,6 +12,12 @@ export class Recipes {
   @Column()
   description: string;
 
-  @Column({ nullable: true }) // facultatif au début
+  @Column()
   img_vignette: string;
+
+  // Vous pouvez avoir d'autres colonnes ici...
+
+  // Relation avec les instructions
+  @OneToMany(() => Instructions, (instruction) => instruction.recipe)
+  instructions: Instructions[];
 }

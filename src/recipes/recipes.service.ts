@@ -1,34 +1,62 @@
-// src/recipes/recipes.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Recipes } from './recipe.entity';
+import { CreateRecipeDto } from './dto/create-recipe.dto';
+import { UpdateRecipeDto } from './dto/update-recipe.dto';
 
 @Injectable()
 export class RecipesService {
   constructor(
     @InjectRepository(Recipes)
-    private recipeRepo: Repository<Recipes>,
+    private recipesRepo: Repository<Recipes>,
   ) {}
 
-  findAll(): Promise<Recipes[]> {
-    return this.recipeRepo.find();
-  }
-
-  async create(
-    title: string,
-    description: string,
-    image?: string, //si il y a une image car pas obligatoire
-  ): Promise<Recipes> {
-    const recipe = this.recipeRepo.create({
-      title,
-      description,
-      img_vignette: image,
+  async findAll(): Promise<Recipes[]> {
+    // Pour la liste, on ne charge pas les instructions
+    return this.recipesRepo.find({
+      select: ['id_recipe', 'title', 'img_vignette'],
     });
-    return this.recipeRepo.save(recipe);
   }
 
-  async findOne(id: string): Promise<Recipes | null> {
-    return this.recipeRepo.findOneBy({ id_recipe: Number(id) });
+  async findOne(id: number): Promise<Recipes> {
+    // Pour une recette spécifique, on charge les instructions associées
+    const recipe = await this.recipesRepo.findOne({
+      where: { id_recipe: id },
+      relations: ['instructions'], // Chargement des instructions liées
+    });
+
+    if (!recipe) {
+      throw new NotFoundException(`Recette avec l'ID ${id} non trouvée`);
+    }
+
+    // Tri des instructions par ordre croissant
+    if (recipe.instructions) {
+      recipe.instructions.sort((a, b) => a.ordre - b.ordre);
+    }
+
+    return recipe;
+  }
+
+  async create(createRecipeDto: CreateRecipeDto): Promise<Recipes> {
+    const newRecipe = this.recipesRepo.create(createRecipeDto);
+    return this.recipesRepo.save(newRecipe);
+  }
+
+  async update(id: number, updateRecipeDto: UpdateRecipeDto): Promise<Recipes> {
+    const recipe = await this.findOne(id);
+
+    // Mise à jour des propriétés
+    Object.assign(recipe, updateRecipeDto);
+
+    return this.recipesRepo.save(recipe);
+  }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.recipesRepo.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Recette avec l'ID ${id} non trouvée`);
+    }
   }
 }
