@@ -12,6 +12,9 @@ export class Instructions {
   @Column()
   ordre: number;
 
-  @ManyToOne(() => Recipes, (recipe) => recipe.instructions, { eager: true })
+  @ManyToOne(() => Recipes, (recipe) => recipe.instructions, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   recipe: Recipes;
 }

@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Recipes } from './recipe.entity';
@@ -53,10 +58,25 @@ export class RecipesService {
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.recipesRepo.delete(id);
+    const recipe = await this.recipesRepo.findOneBy({ id_recipe: id });
 
-    if (result.affected === 0) {
+    if (!recipe) {
       throw new NotFoundException(`Recette avec l'ID ${id} non trouvée`);
+    }
+
+    try {
+      await this.recipesRepo.delete(id); // ou .delete(id) si tu préfères
+    } catch (error) {
+      if (error) {
+        throw new ConflictException(
+          `Impossible de supprimer la recette : elle est encore liée à des instructions.`,
+        );
+      }
+
+      console.error('Erreur lors de la suppression de la recette:', error);
+      throw new InternalServerErrorException(
+        'Erreur serveur lors de la suppression. ' + error,
+      );
     }
   }
 }

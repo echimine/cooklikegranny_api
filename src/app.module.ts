@@ -8,6 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Recipes } from './recipes/recipe.entity';
 import { InstructionsModule } from './instructions/instructions.module';
 import { Instructions } from './instructions/entities/instruction.entity';
+import { UsersModule } from './users/users.module';
+import { Users } from './users/entities/user.entity';
+// import { Users } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -22,12 +25,13 @@ import { Instructions } from './instructions/entities/instruction.entity';
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        entities: [Recipes, Instructions],
+        entities: [Recipes, Instructions, Users],
         synchronize: true,
       }),
     }),
     RecipesModule,
     InstructionsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

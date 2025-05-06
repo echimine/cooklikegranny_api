@@ -12,7 +12,6 @@ import { InstructionsService } from './instructions.service';
 import { InstructionPreviewDto } from './dto/preview-instruction.dto';
 import { CreateInstructionDto } from './dto/create-instruction.dto';
 import { UpdateInstructionDto } from './dto/update-instruction.dto';
-// import { Instructions } from './entities/instruction.entity';
 
 @Controller('instructions')
 export class InstructionsController {

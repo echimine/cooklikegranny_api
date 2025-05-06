@@ -18,6 +18,9 @@ export class Recipes {
   // Vous pouvez avoir d'autres colonnes ici...
 
   // Relation avec les instructions
-  @OneToMany(() => Instructions, (instruction) => instruction.recipe)
+  @OneToMany(() => Instructions, (instruction) => instruction.recipe, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   instructions: Instructions[];
 }
