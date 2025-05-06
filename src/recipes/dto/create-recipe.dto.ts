@@ -11,4 +11,6 @@ export class CreateRecipeDto {
     message: 'La description doit faire au moins 10 caractères',
   })
   description: string;
+
+  img_vignette: string; // champ facultatif ou string normale
 }

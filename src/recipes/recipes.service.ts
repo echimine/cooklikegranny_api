@@ -27,4 +27,8 @@ export class RecipesService {
     });
     return this.recipeRepo.save(recipe);
   }
+
+  async findOne(id: string): Promise<Recipes | null> {
+    return this.recipeRepo.findOneBy({ id_recipe: Number(id) });
+  }
 }
