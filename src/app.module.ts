@@ -11,10 +11,12 @@ import { Instructions } from './instructions/entities/instruction.entity';
 import { UsersModule } from './users/users.module';
 import { Users } from './users/entities/user.entity';
 // import { Users } from './users/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+// import { Auth } from './auth/entities/auth.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // accès partout
+    ConfigModule.forRoot({ isGlobal: true }), // accès partout au .env
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -32,6 +34,7 @@ import { Users } from './users/entities/user.entity';
     RecipesModule,
     InstructionsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
