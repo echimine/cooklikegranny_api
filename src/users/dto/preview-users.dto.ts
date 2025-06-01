@@ -1,13 +1,16 @@
-import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { Exclude, Expose } from 'class-transformer';
 import { UserRole } from '../entities/user.entity';
-export class previewUserDto {
-  @IsString()
-  @IsNotEmpty({ message: 'identifiant requis' })
-  title: string;
 
-  @IsNotEmpty({ message: 'password requis' })
-  password: any;
+export class PreviewUserDto {
+  @Expose()
+  id_user: number;
 
-  @IsEnum(UserRole)
+  @Expose()
+  identifiant: string;
+
+  @Expose()
   role: UserRole;
+
+  @Exclude()
+  password: string; // sera automatiquement exclu de la sortie JSON
 }

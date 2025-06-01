@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { PreviewUserDto } from './dto/preview-users.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -24,8 +26,9 @@ export class UsersService {
     });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<Users> {
-    //vérification de l'identifiant si il existe déjà
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<{ message: string; user: PreviewUserDto }> {
     const existingUser = await this.usersRepo.findOne({
       where: { identifiant: createUserDto.identifiant },
     });
@@ -36,7 +39,7 @@ export class UsersService {
         HttpStatus.CONFLICT,
       );
     }
-    //password hashé
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const newUser = this.usersRepo.create({
@@ -44,6 +47,16 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return this.usersRepo.save(newUser);
+    const savedUser = await this.usersRepo.save(newUser);
+
+    // ✅ Transformation en PreviewUserDto sans mot de passe
+    const previewUser = plainToInstance(PreviewUserDto, savedUser, {
+      excludeExtraneousValues: true,
+    });
+
+    return {
+      message: 'Utilisateur créé avec succès.',
+      user: previewUser,
+    };
   }
 }
