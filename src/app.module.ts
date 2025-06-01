@@ -15,7 +15,7 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // accès partout au .env
+    ConfigModule.forRoot({ isGlobal: true }), // accès partout au .env
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

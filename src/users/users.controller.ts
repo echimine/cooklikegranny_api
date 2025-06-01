@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { AuthService } from '../auth/auth.service'; // corrige le chemin si besoin
 import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService, // <== injecté ici
+  ) {}
 
   @Get()
   findAll() {
@@ -18,7 +21,19 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() createUserDTO: CreateUserDto) {
-    return this.usersService.create(createUserDTO);
+  async create(@Body() createUserDto: CreateUserDto) {
+    // Étape 1 : créer l'utilisateur
+    const created = await this.usersService.create(createUserDto);
+
+    // Étape 2 : générer un token automatiquement
+    const token = await this.authService.signIn({
+      identifiant: createUserDto.identifiant,
+      password: createUserDto.password,
+    });
+
+    return {
+      ...created, // { message, user }
+      access_token: token.access_token,
+    };
   }
 }
