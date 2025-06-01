@@ -13,12 +13,13 @@ async function bootstrap() {
   // Validation automatique
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   // , forbidNonWhitelisted: true
+  const port = process.env.PORT || 3001;
 
   // Serve les images depuis /public/uploads
   app.use(
     '/uploads',
     express.static(join(__dirname, '..', 'public', 'uploads')),
   );
-  await app.listen(3001);
+  await app.listen(port);
 }
 bootstrap();
