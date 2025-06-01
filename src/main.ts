@@ -8,7 +8,8 @@ import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  //enable cors policy
+  app.enableCors();
   // Validation automatique
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   // , forbidNonWhitelisted: true
@@ -18,6 +19,6 @@ async function bootstrap() {
     '/uploads',
     express.static(join(__dirname, '..', 'public', 'uploads')),
   );
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();
