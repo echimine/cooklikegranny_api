@@ -20,6 +20,14 @@ async function bootstrap() {
     '/uploads',
     express.static(join(__dirname, '..', 'public', 'uploads')),
   );
+
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     whitelist: true,
+  //     forbidNonWhitelisted: true,
+  //     transform: true,
+  //   }),
+  // );
   await app.listen(port);
 }
 bootstrap();

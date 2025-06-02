@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { Recipes } from './recipe.entity';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { RecipePreviewDto } from './dto/recipes-preview.dto';
+import { RecipeDetailDto } from './dto/after-creation';
 
 @Injectable()
 export class RecipesService {
@@ -17,11 +19,33 @@ export class RecipesService {
     private recipesRepo: Repository<Recipes>,
   ) {}
 
-  async findAll(): Promise<Recipes[]> {
-    // Pour la liste, on ne charge pas les instructions
-    return this.recipesRepo.find({
-      select: ['id_recipe', 'title', 'img_vignette'],
-    });
+  async findAll(): Promise<RecipePreviewDto[]> {
+    return this.recipesRepo
+      .createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.user', 'user') // join avec la table user
+      .select([
+        'recipe.id_recipe',
+        'recipe.title',
+        'recipe.description',
+        'recipe.img_vignette',
+        'user.id_user',
+        'user.identifiant',
+        'user.role',
+      ])
+      .getMany()
+      .then((recipes) =>
+        recipes.map((recipe) => ({
+          id_recipe: recipe.id_recipe,
+          title: recipe.title,
+          description: recipe.description,
+          img_vignette: recipe.img_vignette,
+          user: {
+            id_user: recipe.user.id_user,
+            identifiant: recipe.user.identifiant,
+            role: recipe.user.role,
+          },
+        })),
+      );
   }
 
   async findOne(id: number): Promise<Recipes> {
@@ -43,9 +67,40 @@ export class RecipesService {
     return recipe;
   }
 
-  async create(createRecipeDto: CreateRecipeDto): Promise<Recipes> {
-    const newRecipe = this.recipesRepo.create(createRecipeDto);
-    return this.recipesRepo.save(newRecipe);
+  async create(
+    createRecipeDto: CreateRecipeDto,
+    userId: number,
+  ): Promise<RecipeDetailDto> {
+    // Création et sauvegarde de la recette
+    const newRecipe = this.recipesRepo.create({
+      ...createRecipeDto,
+      user: { id_user: userId }, // Associe la relation
+    });
+    const savedRecipe = await this.recipesRepo.save(newRecipe);
+
+    // Pour renvoyer l'utilisateur simplifié, on charge ses données
+    const recipeWithUser = await this.recipesRepo.findOne({
+      where: { id_recipe: savedRecipe.id_recipe },
+      relations: ['user'],
+    });
+
+    if (!recipeWithUser) {
+      throw new NotFoundException('Recette non trouvée après création');
+    }
+
+    // ici recipeWithUser est sûr d'exister, plus d'erreur TypeScript
+    const dto = new RecipeDetailDto();
+    dto.id_recipe = recipeWithUser.id_recipe;
+    dto.title = recipeWithUser.title;
+    dto.description = recipeWithUser.description;
+    dto.img_vignette = recipeWithUser.img_vignette;
+    dto.user = {
+      id_user: recipeWithUser.user.id_user,
+      identifiant: recipeWithUser.user.identifiant,
+      role: recipeWithUser.user.role,
+    };
+
+    return dto;
   }
 
   async update(id: number, updateRecipeDto: UpdateRecipeDto): Promise<Recipes> {

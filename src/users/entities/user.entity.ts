@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Recipes } from 'src/recipes/recipe.entity';
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
@@ -25,4 +25,7 @@ export class Users {
 
   @Column({ nullable: true })
   photo?: string;
+
+  @OneToMany(() => Recipes, (recipe) => recipe.user)
+  recipes: Recipes[];
 }

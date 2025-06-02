@@ -1,5 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Instructions } from '../instructions/entities/instruction.entity';
+import { Users } from '../users/entities/user.entity';
 
 @Entity()
 export class Recipes {
@@ -23,4 +30,7 @@ export class Recipes {
     onDelete: 'CASCADE',
   })
   instructions: Instructions[];
+
+  @ManyToOne(() => Users, (user) => user.recipes, { eager: true })
+  user: Users;
 }

@@ -7,10 +7,11 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from '../users/entities/user.entity';
+import { JwtStrategy } from './strategies/jwt.strategies'; // ← importe la stratégie
 
 @Module({
   imports: [
-    ConfigModule, // Important pour utiliser ConfigService ici
+    ConfigModule,
     TypeOrmModule.forFeature([Users]),
     PassportModule,
     JwtModule.registerAsync({
@@ -23,7 +24,7 @@ import { Users } from '../users/entities/user.entity';
     }),
     forwardRef(() => UsersModule),
   ],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy], // ← AJOUT ICI
   controllers: [AuthController],
   exports: [AuthService],
 })

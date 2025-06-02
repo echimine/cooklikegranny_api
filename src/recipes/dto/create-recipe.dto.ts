@@ -1,5 +1,5 @@
 // src/recipes/dto/create-recipe.dto.ts
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, IsOptional } from 'class-validator';
 
 export class CreateRecipeDto {
   @IsString()
@@ -12,5 +12,7 @@ export class CreateRecipeDto {
   })
   description: string;
 
-  img_vignette: string; // champ facultatif ou string normale
+  @IsOptional()
+  @IsString()
+  img_vignette?: string;
 }

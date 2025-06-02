@@ -7,10 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.gards';
+
+import { AuthenticatedRequest } from '../types/express';
 
 @Controller('recipes')
 export class RecipesController {
@@ -19,12 +24,7 @@ export class RecipesController {
   @Get()
   async findAll() {
     const recipes = await this.recipesService.findAll();
-    // Pour la liste, on ne retourne que les informations de base
-    return recipes.map((recipe) => ({
-      id_recipe: recipe.id_recipe,
-      title: recipe.title,
-      img_vignette: recipe.img_vignette,
-    }));
+    return recipes;
   }
 
   @Get(':id')
@@ -51,8 +51,9 @@ export class RecipesController {
   }
 
   @Post()
-  create(@Body() createRecipeDto: CreateRecipeDto) {
-    return this.recipesService.create(createRecipeDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Request() req: AuthenticatedRequest, @Body() dto: CreateRecipeDto) {
+    return this.recipesService.create(dto, req.user.userId);
   }
 
   @Patch(':id')
