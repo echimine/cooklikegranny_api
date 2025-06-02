@@ -26,6 +26,12 @@ export class UsersService {
     });
   }
 
+  async findByIdentifiant(identifiant: string): Promise<Users | null> {
+    return this.usersRepo.findOne({
+      where: { identifiant },
+    });
+  }
+
   async create(
     createUserDto: CreateUserDto,
   ): Promise<{ message: string; user: PreviewUserDto }> {

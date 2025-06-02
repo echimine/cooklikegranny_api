@@ -32,20 +32,20 @@ export class UsersController {
     return this.usersService.findOne(id_user);
   }
 
+  @Get('by-identifiant/:identifiant')
+  findByIdentifiant(@Param('identifiant') identifiant: string) {
+    return this.usersService.findByIdentifiant(identifiant);
+  }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
         destination: (req, file, callback) => {
-          console.log(req.body);
+          const identifiant = req.body.identifiant;
           const fs = require('fs');
-          const identifiant = req.body?.identifiant;
-
-          if (!identifiant) {
-            return callback(new Error('Identifiant manquant'), '');
-          }
-
           const path = `./public/uploads/profils/${identifiant}`;
+
           if (!fs.existsSync(path)) {
             fs.mkdirSync(path, { recursive: true });
           }
@@ -66,8 +66,10 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createUserDto: CreateUserDto,
   ) {
-    const identifiant = createUserDto.identifiant;
-    const photoPath = `/uploads/profils/${identifiant}/${file.filename}`;
+    const photoPath = file
+      ? `/uploads/profils/${createUserDto.identifiant}/${file.filename}`
+      : undefined;
+
     const userWithPhoto = { ...createUserDto, photo: photoPath };
 
     const created = await this.usersService.create(userWithPhoto);
