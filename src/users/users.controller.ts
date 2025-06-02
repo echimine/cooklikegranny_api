@@ -22,6 +22,16 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id_user: number) {
+    return this.usersService.findOne(id_user);
+  }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('photo', {
