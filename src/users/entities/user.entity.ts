@@ -22,4 +22,7 @@ export class Users {
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @Column({ nullable: true })
+  photo?: string;
 }

@@ -11,6 +11,9 @@ export class PreviewUserDto {
   @Expose()
   role: UserRole;
 
+  @Expose()
+  photo: string;
+
   @Exclude()
   password: string; // sera automatiquement exclu de la sortie JSON
 }

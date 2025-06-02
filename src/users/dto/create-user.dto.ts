@@ -15,4 +15,6 @@ export class CreateUserDto {
 
   @IsEnum(UserRole)
   role: UserRole;
+
+  photo?: string;
 }
