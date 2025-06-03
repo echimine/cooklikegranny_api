@@ -6,6 +6,12 @@ export class UserBriefDto {
   role: string;
 }
 
+export class InstructionsDto {
+  id_instruction: number;
+  text_instruction: string;
+  ordre: string;
+}
+
 export class RecipePreviewDto {
   id_recipe: number;
   title: string;

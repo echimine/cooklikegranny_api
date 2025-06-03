@@ -20,9 +20,10 @@ export class RecipesService {
   ) {}
 
   async findAll(): Promise<RecipePreviewDto[]> {
-    return this.recipesRepo
+    const recipes = await this.recipesRepo
       .createQueryBuilder('recipe')
-      .leftJoinAndSelect('recipe.user', 'user') // join avec la table user
+      .leftJoinAndSelect('recipe.user', 'user') // jointure avec user
+      .leftJoinAndSelect('recipe.instructions', 'instructions') // jointure avec instructions
       .select([
         'recipe.id_recipe',
         'recipe.title',
@@ -31,21 +32,28 @@ export class RecipesService {
         'user.id_user',
         'user.identifiant',
         'user.role',
+        'instructions.id_instruction',
+        'instructions.text_instruction',
+        'instructions.ordre',
       ])
-      .getMany()
-      .then((recipes) =>
-        recipes.map((recipe) => ({
-          id_recipe: recipe.id_recipe,
-          title: recipe.title,
-          description: recipe.description,
-          img_vignette: recipe.img_vignette,
-          user: {
-            id_user: recipe.user.id_user,
-            identifiant: recipe.user.identifiant,
-            role: recipe.user.role,
-          },
-        })),
-      );
+      .getMany();
+
+    return recipes.map((recipe) => ({
+      id_recipe: recipe.id_recipe,
+      title: recipe.title,
+      description: recipe.description,
+      img_vignette: recipe.img_vignette,
+      user: {
+        id_user: recipe.user.id_user,
+        identifiant: recipe.user.identifiant,
+        role: recipe.user.role,
+      },
+      instructions: recipe.instructions.map((instr) => ({
+        id_instruction: instr.id_instruction,
+        text_instrcution: instr.text_instruction,
+        ordre: instr.ordre,
+      })),
+    }));
   }
 
   async findOne(id: number): Promise<Recipes> {

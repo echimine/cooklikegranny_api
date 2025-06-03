@@ -41,7 +41,7 @@ export class UsersController {
     FileInterceptor('photo', {
       storage: diskStorage({
         destination: (req, file, callback) => {
-          const identifiant = req.body.identifiant;
+          const identifiant  = req.body.identifiant;
           const fs = require('fs');
           const path = `./public/uploads/profils/${identifiant}`;
 

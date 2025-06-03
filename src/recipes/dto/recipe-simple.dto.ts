@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { InstructionPreviewDto } from 'src/instructions/dto/preview-instruction.dto';
 
 export class RecipeSimpleDto {
@@ -15,5 +15,6 @@ export class RecipeSimpleDto {
   img_vignette: string;
 
   @Expose()
+  @Type(() => InstructionPreviewDto)
   instructions: InstructionPreviewDto[];
 }

@@ -1,7 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Recipes } from '../../recipes/recipe.entity'; // <-- ajuste le chemin si besoin
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Unique,
+} from 'typeorm';
+import { Recipes } from '../../recipes/recipe.entity';
 
 @Entity()
+@Unique(['ordre', 'recipe']) // ordre unique pour chaque recette
 export class Instructions {
   @PrimaryGeneratedColumn()
   id_instruction: number;
