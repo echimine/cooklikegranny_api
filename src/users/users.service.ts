@@ -7,6 +7,8 @@ import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { PreviewUserDto } from './dto/preview-users.dto';
+
+import { UserWithRecipesDto } from './dto/user-with-recipes.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -16,21 +18,42 @@ export class UsersService {
     private usersRepo: Repository<Users>,
   ) {}
 
-  async findAll(): Promise<Users[]> {
-    return this.usersRepo.find({
-      relations: ['recipes'],
+  async findAll(): Promise<UserWithRecipesDto[]> {
+    const users = await this.usersRepo.find({
+      order: { id_user: 'ASC' },
+      relations: ['recipes', 'recipes.instructions'],
+    });
+
+    return plainToInstance(UserWithRecipesDto, users, {
+      excludeExtraneousValues: true,
     });
   }
 
-  async findOne(id: number): Promise<Users | null> {
-    return this.usersRepo.findOne({
+  async findOne(id: number): Promise<UserWithRecipesDto | null> {
+    const user = await this.usersRepo.findOne({
       where: { id_user: id },
+      relations: ['recipes', 'recipes.instructions'],
+    });
+
+    if (!user) return null;
+
+    return plainToInstance(UserWithRecipesDto, user, {
+      excludeExtraneousValues: true,
     });
   }
 
-  async findByIdentifiant(identifiant: string): Promise<Users | null> {
-    return this.usersRepo.findOne({
+  async findByIdentifiant(
+    identifiant: string,
+  ): Promise<UserWithRecipesDto | null> {
+    const user = await this.usersRepo.findOne({
       where: { identifiant },
+      relations: ['recipes', 'recipes.instructions'],
+    });
+
+    if (!user) return null;
+
+    return plainToInstance(UserWithRecipesDto, user, {
+      excludeExtraneousValues: true,
     });
   }
 

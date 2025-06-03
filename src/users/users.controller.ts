@@ -31,7 +31,6 @@ export class UsersController {
   findOne(@Param('id') id_user: number) {
     return this.usersService.findOne(id_user);
   }
-
   @Get('by-identifiant/:identifiant')
   findByIdentifiant(@Param('identifiant') identifiant: string) {
     return this.usersService.findByIdentifiant(identifiant);
