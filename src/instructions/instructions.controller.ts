@@ -60,6 +60,7 @@ export class InstructionsController {
   ): Promise<InstructionPreviewDto> {
     const instruction =
       await this.instructionsService.create(createInstructionDto);
+
     return {
       id_instruction: instruction.id_instruction,
       text_instruction: instruction.text_instruction,

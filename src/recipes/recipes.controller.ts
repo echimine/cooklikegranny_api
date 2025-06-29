@@ -57,11 +57,15 @@ export class RecipesController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRecipeDto: UpdateRecipeDto,
   ) {
-    return this.recipesService.update(id, updateRecipeDto);
+    const updatedRecipe = await this.recipesService.update(id, updateRecipeDto);
+    return {
+      message: 'Recette mise à jour avec succès !',
+      data: updatedRecipe,
+    };
   }
 
   @Delete(':id')

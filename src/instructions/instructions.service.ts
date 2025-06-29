@@ -4,12 +4,16 @@ import { Repository } from 'typeorm';
 import { Instructions } from './entities/instruction.entity';
 import { CreateInstructionDto } from './dto/create-instruction.dto';
 import { UpdateInstructionDto } from './dto/update-instruction.dto';
+import { Recipes } from 'src/recipes/recipe.entity';
 
 @Injectable()
 export class InstructionsService {
   constructor(
     @InjectRepository(Instructions)
     private instructionsRepo: Repository<Instructions>,
+
+    @InjectRepository(Recipes)
+    private readonly recipesRepo: Repository<Recipes>, // Injection du repo Recettes
   ) {}
 
   async findAll(): Promise<Instructions[]> {
@@ -41,13 +45,24 @@ export class InstructionsService {
   async create(
     createInstructionDto: CreateInstructionDto,
   ): Promise<Instructions> {
+    // Récupération de la recette liée
+    const recipe = await this.recipesRepo.findOneBy({
+      id_recipe: createInstructionDto.id_recipe,
+    });
+    if (!recipe) {
+      throw new NotFoundException(
+        `Recette avec id ${createInstructionDto.id_recipe} non trouvée`,
+      );
+    }
+
+    // Création de l'instruction avec la relation Recipe correctement assignée
     const newInstruction = this.instructionsRepo.create({
       text_instruction: createInstructionDto.text_instruction,
       ordre: createInstructionDto.ordre,
-      recipe: { id_recipe: createInstructionDto.id_recipe },
+      recipe: recipe,
     });
 
-    return this.instructionsRepo.save(newInstruction);
+    return await this.instructionsRepo.save(newInstruction);
   }
 
   async update(
